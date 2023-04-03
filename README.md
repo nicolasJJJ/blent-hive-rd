@@ -64,6 +64,7 @@ LOAD DATA INPATH '/table/order_products.csv' INTO TABLE essou.order_products;
 ~~~~~~~~~~~~~~
 
 Création des tables orders_p & order_products_p qui sont partitionnées par rapport à leurs prédecésseurs (orders et order_products).
+
 ~~~~~~~~~~~~~~
 CREATE EXTERNAL TABLE IF NOT EXISTS essou.orders_p (order_id INT, user_id INT, order_number INT, days_since_prior_order DOUBLE, eval_set String, order_hour_of_day INT) 
 PARTITIONED BY (order_dow INT);
@@ -78,19 +79,22 @@ insert overwrite table essou.order_products_p select order_id, product_id, add_t
 
 <h2>Tables analytiques</h2>
 
-Une table aisles_products dénombrant le nombre d'articles dans chaque catégorie/
+Une table aisles_products dénombrant le nombre d'articles dans chaque catégorie
+
 ~~~~~~~~~~~~~~
 create table if not exists essou.aisles_products (id_aisle INT, aisle STRING, number INT);
 insert overwrite table essou.aisles_products select T1.aisle_id, T1.aisle, T2.county from essou.aisles as T1 LEFT JOIN (select aisle_id, count(*) as county from essou.products GROUP BY aisle_id) as T2 ON (T1.aisle_id = T2.aisle_id) GROUP BY T1.aisle_id, T1.aisle, T2.county;
 ~~~~~~~~~~~~~~
 
 Une table departments_products dénombrant le nombre d'articles dans chaque département.
+
 ~~~~~~~~~~~~~~
 create table if not exists essou.department_products (department_id INT, department STRING, number INT);
 insert overwrite table essou.department_products select T1.department_id, T1.department, T2.county from essou.departments as T1 LEFT JOIN (select department_id, count(*) as county from essou.products GROUP BY department_id) as T2 ON (T1.department_id = T2.department_id) GROUP BY T1.department_id, T1.department, T2.county;
 ~~~~~~~~~~~~~~
 
 Une table orders_per_users dénombrant le nombre d'articles moyen par commande, et ce pour chaque utilisateur.
+
 ~~~~~~~~~~~~~~
 create table if not exists essou.orders_per_users (user_id INT, count_products_per_cmd INT);
 insert overwrite table essou.orders_per_users select T1.user_id, AVG(T2.maxi) as am from essou.orders as T1 LEFT JOIN (select order_id, MAX(add_to_cart_order) as maxi FROM essou.order_products_p GROUP BY order_id) AS T2 ON (T1.order_id = T2.order_id) GROUP BY T1.user_id HAVING am > 0;
