@@ -25,6 +25,7 @@ hive
 ~~~~~~~~~~~~~~
 
 Création des tables sans référence externes aux fichiers CSV.
+
 ~~~~~~~~~~~~~~
 CREATE DATABASE essou;
 
