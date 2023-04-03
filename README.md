@@ -104,6 +104,7 @@ insert overwrite table essou.orders_per_users select T1.user_id, AVG(T2.maxi) as
 <h2>Requêtes pré-construites</h2>
 
 Création d'un répertoire pour les requêtes SQL déjà enregistrées
+
 ~~~~~~~~~~~~~~
 hadoop fs -mkdir /requests
 ~~~~~~~~~~~~~~
@@ -116,6 +117,7 @@ vi best_category.sql
 ~~~~~~~~~~~~~~
 
 Contenu de best_category.sql
+
 ~~~~~~~~~~~~~~
 SELECT T1.aisle, count(T3.order_id) from (select aisle_id, aisle from essou.aisles) as T1
 JOIN essou.products as T2 ON (T1.aisle_id = T2.aisle_id)
@@ -126,6 +128,7 @@ order by count(T3.order_id) DESC limit 1;
 ~~~~~~~~~~~~~~
 
 Insertion et utilisation de best_category.sql avec l'attribut USERID = 1
+
 ~~~~~~~~~~~~~~
 hadoop fs -copyFromLocal best_category.sql /requests/best_category.sql
 hive -hiveconf USERID=1 -f  <(hdfs dfs -cat /requests/best_category.sql) > best_category_output.txt
@@ -134,11 +137,13 @@ hive -hiveconf USERID=1 -f  <(hdfs dfs -cat /requests/best_category.sql) > best_
 <h3>best_hour</h3>
 
 Création du fichier best_hour.sql
+
 ~~~~~~~~~~~~~~
 vi best_hour.sql
 ~~~~~~~~~~~~~~
 
 Contenu de best_hour.sql
+
 ~~~~~~~~~~~~~~
 SELECT T1.order_hour_of_day
 from essou.orders_p as T1
@@ -149,6 +154,7 @@ order by count(T2.product_id) DESC limit 1;
 ~~~~~~~~~~~~~~
 
 Insertion et utilisation de best_hour.sql avec l'attribut PRODUCTID=1
+
 ~~~~~~~~~~~~~~
 hadoop fs -copyFromLocal best_hour.sql /requests/best_hour.sql
 hive -hiveconf PRODUCTID=1 -f  <(hdfs dfs -cat /requests/best_hour.sql) > best_hour_output.txt
@@ -156,9 +162,11 @@ hive -hiveconf PRODUCTID=1 -f  <(hdfs dfs -cat /requests/best_hour.sql) > best_h
 
 <h3>orders_department_count</h3>
 Création du fichier orders_department_count.sql
+
 ~~~~~~~~~~~~~~
 vi orders_department_count.sql
 ~~~~~~~~~~~~~~
+
 Contenu de orders_department_count.sql
 
 ~~~~~~~~~~~~~~
@@ -169,6 +177,7 @@ join essou.order_products_p as T3 on (T2.product_id = T3.product_id)
 where T3.order_id = ${hiveconf:ORDERID}
 group by T1.department;
 ~~~~~~~~~~~~~~
+
 Insertion et utilisation de orders_department_count.sql avec l'attribut ORDERID=2821986
 
 ~~~~~~~~~~~~~~
@@ -183,10 +192,13 @@ hive -hiveconf ORDERID=2821986 -f  <(hdfs dfs -cat /requests/orders_department_c
 <h2>Base d'apprentissage pour le Machine Learning</h2>
 
 Création du fichier machine_learnator.sql qui contient les données "applaties" de toutes les tables liées entre elles.
+
 ~~~~~~~~~~~~~~
 vi machine_learnator.sql
 ~~~~~~~~~~~~~~
+
 Contenu de machine_learnator.sql
+
 ~~~~~~~~~~~~~~
 select T2.product_id, T2.product_name, T1.aisle, T3.department, T4.order_id, T4.add_to_cart_order, T4.reordered, T5.user_id, T5.order_number, T5.order_dow, T5.eval_set, T5.order_hour_of_day, T5.days_since_prior_order
 from essou.aisles as T1 
@@ -197,6 +209,7 @@ join essou.orders_p as T5 on (T4.order_id = T5.order_id);
 ~~~~~~~~~~~~~~
 
 Insertion et utilisation de machine_learnator.sql.
+
 ~~~~~~~~~~~~~~
 hadoop fs -copyFromLocal machine_learnator.sql /requests/machine_learnator.sql
 hive -f  <(hdfs dfs -cat /requests/machine_learnator.sql) > machine_learnator.txt
