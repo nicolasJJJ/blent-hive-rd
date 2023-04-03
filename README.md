@@ -33,24 +33,20 @@ comment 'Aisle Table'
 row format delimited
 fields terminated by ',';
 
-
 create external table if not exists essou.departments (department_id Int,department String, PRIMARY KEY (department_id) DISABLE NOVALIDATE)
 comment 'department Table'
 row format delimited
 fields terminated by ',';
-
 
 create external table if not exists essou.products (product_id Int, product_name String, aisle_id Int, department_id Int, PRIMARY KEY (product_id) DISABLE NOVALIDATE, CONSTRAINT fk FOREIGN KEY (aisle_id) REFERENCES essou.aisles(aisle_id) DISABLE NOVALIDATE, CONSTRAINT fkb FOREIGN KEY (department_id) REFERENCES essou.departments(department_id) DISABLE NOVALIDATE)
 comment 'products Table'
 row format delimited
 fields terminated by ',';
 
-
 create external table if not exists essou.orders (order_id INT ,user_id INT, eval_set String, order_number INT, order_dow INT, order_hour_of_day INT, days_since_prior_order DOUBLE, PRIMARY KEY (order_id) DISABLE NOVALIDATE)
 comment 'orders Table'
 row format delimited
 fields terminated by ',';
-
 
 create external table if not exists essou.order_products (order_id INT ,product_id INT, add_to_cart_order INT, reordered INT, CONSTRAINT fka FOREIGN KEY (order_id) REFERENCES essou.orders(order_id) DISABLE NOVALIDATE, CONSTRAINT fkc FOREIGN KEY (product_id) REFERENCES essou.products(product_id) DISABLE NOVALIDATE)
 comment 'order_products Table'
