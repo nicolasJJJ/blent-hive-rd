@@ -62,14 +62,19 @@ LOAD DATA INPATH '/table/products.csv' INTO TABLE essou.products;
 LOAD DATA INPATH '/table/orders.csv' INTO TABLE essou.orders;
 LOAD DATA INPATH '/table/order_products.csv' INTO TABLE essou.order_products;
 ~~~~~~~~~~~~~~
+
+Création des tables orders_p & order_products_p qui sont partitionnées par rapport à leurs prédecésseurs (orders et order_products).
+~~~~~~~~~~~~~~
 CREATE EXTERNAL TABLE IF NOT EXISTS essou.orders_p (order_id INT, user_id INT, order_number INT, days_since_prior_order DOUBLE, eval_set String, order_hour_of_day INT) 
 PARTITIONED BY (order_dow INT);
 insert overwrite table essou.orders_p select order_id ,user_id, order_number, days_since_prior_order, eval_set, order_hour_of_day, order_dow from essou.orders;
+~~~~~~~~~~~~~~
 
-
+~~~~~~~~~~~~~~
 CREATE EXTERNAL TABLE IF NOT EXISTS essou.order_products_p (order_id INT ,product_id INT, add_to_cart_order INT) 
 PARTITIONED BY (reordered INT);
 insert overwrite table essou.order_products_p select order_id, product_id, add_to_cart_order, reordered from essou.order_products;
+~~~~~~~~~~~~~~
 
 <h2>Tables analytiques</h2>
 
